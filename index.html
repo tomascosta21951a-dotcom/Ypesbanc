@@ -30,11 +30,11 @@
             overflow: hidden;
         }
 
-        .login-section, .admin-panel, .user-panel {
+        .login-section, .admin-panel, .user-panel, .password-setup {
             padding: 40px;
         }
 
-        .login-section h1 {
+        .login-section h1, .password-setup h1 {
             color: #667eea;
             margin-bottom: 30px;
             text-align: center;
@@ -214,7 +214,7 @@
             margin-right: 15px;
         }
 
-        .delete-btn {
+        .delete-btn, .change-password-btn {
             padding: 8px 16px;
             background: #dc3545;
             color: white;
@@ -225,9 +225,20 @@
             width: auto;
         }
 
+        .change-password-btn {
+            background: #ffc107;
+            margin-top: 20px;
+        }
+
         .delete-btn:hover {
             background: #c82333;
             transform: none;
+        }
+
+        .change-password-btn:hover {
+            background: #e0a800;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 193, 7, 0.4);
         }
 
         .logout-btn {
@@ -239,15 +250,18 @@
             box-shadow: 0 5px 20px rgba(220, 53, 69, 0.4);
         }
 
-        .error {
-            color: #dc3545;
+        .error, .success {
             text-align: center;
             margin-top: 10px;
             font-size: 14px;
         }
 
-        .currency {
-            font-family: monospace;
+        .error {
+            color: #dc3545;
+        }
+
+        .success {
+            color: #28a745;
         }
 
         .section-title {
@@ -264,6 +278,19 @@
 
         .empty-state p {
             font-size: 16px;
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+        .info-box p {
+            color: #1565C0;
+            margin: 0;
         }
 
         /* Custom Select Styling */
@@ -374,6 +401,12 @@
             color: #667eea;
             font-weight: bold;
         }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+        }
     </style>
 </head>
 <body>
@@ -385,12 +418,81 @@
                 <label for="email">Email:</label>
                 <input type="email" id="email" placeholder="Digite seu email">
             </div>
-            <div class="form-group" id="passwordField" style="display: none;">
+            <div class="form-group" id="passwordField">
                 <label for="password">Palavra-passe:</label>
                 <input type="password" id="password" placeholder="Digite sua palavra-passe">
             </div>
             <button onclick="login()">Entrar</button>
+            <button onclick="showRegister()" style="background: #28a745; margin-top: 10px;">Cadastrar-me</button>
             <p class="error" id="loginError"></p>
+            <p class="loading hidden" id="loadingMsg">A carregar dados...</p>
+        </div>
+
+        <!-- Register Section -->
+        <div class="login-section hidden" id="registerSection">
+            <h1>📝 Cadastro</h1>
+            <div class="info-box">
+                <p>Preencha seus dados para criar uma conta.</p>
+            </div>
+            <div class="form-group">
+                <label for="regName">Nome:</label>
+                <input type="text" id="regName" placeholder="Digite seu nome">
+            </div>
+            <div class="form-group">
+                <label for="regEmail">Email:</label>
+                <input type="email" id="regEmail" placeholder="Digite seu email">
+            </div>
+            <div class="form-group">
+                <label for="regPassword">Palavra-passe:</label>
+                <input type="password" id="regPassword" placeholder="Crie uma palavra-passe">
+            </div>
+            <div class="form-group">
+                <label for="regConfirmPassword">Confirmar Palavra-passe:</label>
+                <input type="password" id="regConfirmPassword" placeholder="Confirme sua palavra-passe">
+            </div>
+            <button onclick="register()">Cadastrar</button>
+            <button onclick="backToLogin()" style="background: #6c757d; margin-top: 10px;">Voltar ao Login</button>
+            <p class="error" id="registerError"></p>
+            <p class="success" id="registerSuccess"></p>
+        </div>
+
+        <!-- Password Setup Section -->
+        <div class="password-setup hidden" id="passwordSetup">
+            <h1>🔐 Criar Palavra-passe</h1>
+            <div class="info-box">
+                <p>Bem-vindo! Por favor, crie uma palavra-passe para proteger sua conta.</p>
+            </div>
+            <div class="form-group">
+                <label for="newPassword">Nova Palavra-passe:</label>
+                <input type="password" id="newPassword" placeholder="Digite sua nova palavra-passe">
+            </div>
+            <div class="form-group">
+                <label for="confirmPassword">Confirmar Palavra-passe:</label>
+                <input type="password" id="confirmPassword" placeholder="Confirme sua palavra-passe">
+            </div>
+            <button onclick="createPassword()">Criar Palavra-passe</button>
+            <p class="error" id="passwordError"></p>
+        </div>
+
+        <!-- Change Password Section -->
+        <div class="password-setup hidden" id="changePasswordSection">
+            <h1>🔐 Alterar Palavra-passe</h1>
+            <div class="form-group">
+                <label for="currentPassword">Palavra-passe Atual:</label>
+                <input type="password" id="currentPassword" placeholder="Digite sua palavra-passe atual">
+            </div>
+            <div class="form-group">
+                <label for="newPassword2">Nova Palavra-passe:</label>
+                <input type="password" id="newPassword2" placeholder="Digite sua nova palavra-passe">
+            </div>
+            <div class="form-group">
+                <label for="confirmPassword2">Confirmar Nova Palavra-passe:</label>
+                <input type="password" id="confirmPassword2" placeholder="Confirme sua nova palavra-passe">
+            </div>
+            <button onclick="changePassword()">Alterar Palavra-passe</button>
+            <button class="logout-btn" onclick="cancelChangePassword()">Cancelar</button>
+            <p class="error" id="changePasswordError"></p>
+            <p class="success" id="changePasswordSuccess"></p>
         </div>
 
         <!-- Admin Panel -->
@@ -462,6 +564,7 @@
                 </div>
             </div>
 
+            <button class="change-password-btn" onclick="showChangePassword()">🔑 Alterar Palavra-passe</button>
             <button class="logout-btn" onclick="logout()">Sair</button>
         </div>
 
@@ -479,6 +582,7 @@
                 <div id="userTransactionsList"></div>
             </div>
 
+            <button class="change-password-btn" onclick="showChangePassword()">🔑 Alterar Palavra-passe</button>
             <button class="logout-btn" onclick="logout()">Sair</button>
         </div>
     </div>
@@ -492,46 +596,207 @@
         let currentTab = 'transactions';
         let selectedPersonId = null;
         let currentUser = null;
+        let tempLoginEmail = null;
 
-        // Show/hide password field based on email
-        document.getElementById('email').addEventListener('input', function() {
-            const email = this.value.trim();
-            const passwordField = document.getElementById('passwordField');
-            
-            if (email === ADMIN_EMAIL) {
-                passwordField.style.display = 'block';
-            } else {
-                passwordField.style.display = 'none';
-                document.getElementById('password').value = '';
+        // Load data from cloud storage on startup
+        async function loadFromCloud() {
+            try {
+                const peopleData = await window.storage.get('people-data', true);
+                const transactionsData = await window.storage.get('transactions-data', true);
+                const totalData = await window.storage.get('total-ypes', true);
+
+                if (peopleData && peopleData.value) {
+                    people = JSON.parse(peopleData.value);
+                }
+                if (transactionsData && transactionsData.value) {
+                    transactions = JSON.parse(transactionsData.value);
+                }
+                if (totalData && totalData.value) {
+                    totalYpes = parseInt(totalData.value);
+                }
+            } catch (error) {
+                console.log('Primeira vez a usar o sistema ou dados não encontrados');
             }
-        });
+        }
 
-        function login() {
+        // Save data to cloud storage
+        async function saveToCloud() {
+            try {
+                await window.storage.set('people-data', JSON.stringify(people), true);
+                await window.storage.set('transactions-data', JSON.stringify(transactions), true);
+                await window.storage.set('total-ypes', totalYpes.toString(), true);
+            } catch (error) {
+                console.error('Erro ao guardar dados:', error);
+                alert('Erro ao guardar dados. Por favor, tente novamente.');
+            }
+        }
+
+        async function login() {
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             const errorEl = document.getElementById('loginError');
+            const loadingEl = document.getElementById('loadingMsg');
+
+            if (!email) {
+                errorEl.textContent = 'Por favor, insira um email!';
+                return;
+            }
+
+            loadingEl.classList.remove('hidden');
+            errorEl.textContent = '';
+
+            // Load data from cloud
+            await loadFromCloud();
 
             if (email === ADMIN_EMAIL) {
                 if (password === ADMIN_PASSWORD) {
                     document.getElementById('loginSection').classList.add('hidden');
                     document.getElementById('adminPanel').classList.remove('hidden');
                     currentUser = { email, isAdmin: true };
-                    errorEl.textContent = '';
+                    loadingEl.classList.add('hidden');
                     loadData();
                 } else {
                     errorEl.textContent = 'Palavra-passe incorreta!';
+                    loadingEl.classList.add('hidden');
                 }
             } else {
                 const person = people.find(p => p.email === email);
                 if (person) {
-                    document.getElementById('loginSection').classList.add('hidden');
-                    document.getElementById('userPanel').classList.remove('hidden');
-                    currentUser = { ...person, isAdmin: false };
-                    errorEl.textContent = '';
-                    loadUserData();
+                    // Check if person has password
+                    if (!person.password) {
+                        // First time login - need to create password
+                        tempLoginEmail = email;
+                        document.getElementById('loginSection').classList.add('hidden');
+                        document.getElementById('passwordSetup').classList.remove('hidden');
+                        loadingEl.classList.add('hidden');
+                    } else {
+                        // Check password
+                        if (password === person.password) {
+                            document.getElementById('loginSection').classList.add('hidden');
+                            document.getElementById('userPanel').classList.remove('hidden');
+                            currentUser = { ...person, isAdmin: false };
+                            loadingEl.classList.add('hidden');
+                            loadUserData();
+                        } else {
+                            errorEl.textContent = 'Palavra-passe incorreta!';
+                            loadingEl.classList.add('hidden');
+                        }
+                    }
                 } else {
                     errorEl.textContent = 'Email não encontrado!';
+                    loadingEl.classList.add('hidden');
                 }
+            }
+        }
+
+        async function createPassword() {
+            const newPass = document.getElementById('newPassword').value;
+            const confirmPass = document.getElementById('confirmPassword').value;
+            const errorEl = document.getElementById('passwordError');
+
+            if (!newPass || !confirmPass) {
+                errorEl.textContent = 'Por favor, preencha todos os campos!';
+                return;
+            }
+
+            if (newPass !== confirmPass) {
+                errorEl.textContent = 'As palavras-passe não coincidem!';
+                return;
+            }
+
+            if (newPass.length < 4) {
+                errorEl.textContent = 'A palavra-passe deve ter pelo menos 4 caracteres!';
+                return;
+            }
+
+            // Save password for the person
+            const person = people.find(p => p.email === tempLoginEmail);
+            if (person) {
+                person.password = newPass;
+                await saveToCloud();
+
+                document.getElementById('passwordSetup').classList.add('hidden');
+                document.getElementById('userPanel').classList.remove('hidden');
+                currentUser = { ...person, isAdmin: false };
+                tempLoginEmail = null;
+                document.getElementById('newPassword').value = '';
+                document.getElementById('confirmPassword').value = '';
+                loadUserData();
+            }
+        }
+
+        function showChangePassword() {
+            if (currentUser.isAdmin) {
+                document.getElementById('adminPanel').classList.add('hidden');
+            } else {
+                document.getElementById('userPanel').classList.add('hidden');
+            }
+            document.getElementById('changePasswordSection').classList.remove('hidden');
+        }
+
+        function cancelChangePassword() {
+            document.getElementById('changePasswordSection').classList.add('hidden');
+            document.getElementById('currentPassword').value = '';
+            document.getElementById('newPassword2').value = '';
+            document.getElementById('confirmPassword2').value = '';
+            document.getElementById('changePasswordError').textContent = '';
+            document.getElementById('changePasswordSuccess').textContent = '';
+
+            if (currentUser.isAdmin) {
+                document.getElementById('adminPanel').classList.remove('hidden');
+            } else {
+                document.getElementById('userPanel').classList.remove('hidden');
+            }
+        }
+
+        async function changePassword() {
+            const currentPass = document.getElementById('currentPassword').value;
+            const newPass = document.getElementById('newPassword2').value;
+            const confirmPass = document.getElementById('confirmPassword2').value;
+            const errorEl = document.getElementById('changePasswordError');
+            const successEl = document.getElementById('changePasswordSuccess');
+
+            errorEl.textContent = '';
+            successEl.textContent = '';
+
+            if (!currentPass || !newPass || !confirmPass) {
+                errorEl.textContent = 'Por favor, preencha todos os campos!';
+                return;
+            }
+
+            // Check current password
+            if (currentUser.isAdmin) {
+                if (currentPass !== ADMIN_PASSWORD) {
+                    errorEl.textContent = 'Palavra-passe atual incorreta!';
+                    return;
+                }
+                errorEl.textContent = 'Não é possível alterar a palavra-passe do administrador!';
+                return;
+            } else {
+                const person = people.find(p => p.email === currentUser.email);
+                if (!person || person.password !== currentPass) {
+                    errorEl.textContent = 'Palavra-passe atual incorreta!';
+                    return;
+                }
+
+                if (newPass !== confirmPass) {
+                    errorEl.textContent = 'As novas palavras-passe não coincidem!';
+                    return;
+                }
+
+                if (newPass.length < 4) {
+                    errorEl.textContent = 'A palavra-passe deve ter pelo menos 4 caracteres!';
+                    return;
+                }
+
+                person.password = newPass;
+                currentUser.password = newPass;
+                await saveToCloud();
+
+                successEl.textContent = 'Palavra-passe alterada com sucesso!';
+                setTimeout(() => {
+                    cancelChangePassword();
+                }, 2000);
             }
         }
 
@@ -568,7 +833,7 @@
             }
         }
 
-        function addPerson() {
+        async function addPerson() {
             const name = document.getElementById('personName').value.trim();
             const email = document.getElementById('personEmail').value.trim();
 
@@ -586,10 +851,12 @@
                 id: Date.now(),
                 name,
                 email,
-                balance: 0
+                balance: 0,
+                password: null
             };
 
             people.push(person);
+            await saveToCloud();
 
             document.getElementById('personName').value = '';
             document.getElementById('personEmail').value = '';
@@ -598,7 +865,7 @@
             updatePersonSelect();
         }
 
-        function deletePerson(id) {
+        async function deletePerson(id) {
             if (confirm('Tem certeza que deseja remover esta pessoa?')) {
                 const person = people.find(p => p.id === id);
                 if (person) {
@@ -607,6 +874,8 @@
                 
                 people = people.filter(p => p.id !== id);
                 transactions = transactions.filter(t => t.personId !== id);
+                
+                await saveToCloud();
                 
                 updatePeopleDisplay();
                 updatePersonSelect();
@@ -668,7 +937,7 @@
             });
         }
 
-        function addTransaction() {
+        async function addTransaction() {
             const amount = parseInt(document.getElementById('amount').value);
             const action = document.getElementById('action').value.trim();
 
@@ -696,6 +965,8 @@
             transactions.unshift(transaction);
             person.balance += amount;
             totalYpes += amount;
+
+            await saveToCloud();
 
             selectedPersonId = null;
             document.getElementById('selectedPersonText').textContent = '-- Selecione uma pessoa --';
@@ -777,6 +1048,7 @@
             document.getElementById('userPanel').classList.add('hidden');
             document.getElementById('loginSection').classList.remove('hidden');
             document.getElementById('email').value = '';
+            document.getElementById('password').value = '';
             currentUser = null;
         }
 
@@ -786,6 +1058,11 @@
                 document.querySelector('.custom-select')?.classList.remove('active');
                 document.getElementById('customOptions')?.classList.remove('active');
             }
+        });
+
+        // Load data on page load
+        window.addEventListener('load', async () => {
+            await loadFromCloud();
         });
     </script>
 </body>
