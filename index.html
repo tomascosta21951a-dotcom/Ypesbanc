@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestão</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 1200px;
+            overflow: hidden;
+        }
+
+        .login-section, .admin-panel, .user-panel {
+            padding: 40px;
+        }
+
+        .login-section h1 {
+            color: #667eea;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border 0.3s;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab {
+            padding: 15px 30px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+            width: auto;
+        }
+
+        .tab:hover {
+            color: #667eea;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .stats {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .stats h2 {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .stats p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        .transaction-list, .people-list {
+            margin-top: 30px;
+        }
+
+        .transaction-item, .person-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .transaction-info, .person-info {
+            flex: 1;
+        }
+
+        .transaction-info h3, .person-info h3 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .transaction-info p, .person-info p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .transaction-amount {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .person-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .person-balance {
+            font-size: 20px;
+            font-weight: bold;
+            color: #667eea;
+            margin-right: 15px;
+        }
+
+        .delete-btn {
+            padding: 8px 16px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            width: auto;
+        }
+
+        .delete-btn:hover {
+            background: #c82333;
+            transform: none;
+        }
+
+        .logout-btn {
+            background: #dc3545;
+            margin-top: 20px;
+        }
+
+        .logout-btn:hover {
+            box-shadow: 0 5px 20px rgba(220, 53, 69, 0.4);
+        }
+
+        .error {
+            color: #dc3545;
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .currency {
+            font-family: monospace;
+        }
+
+        .section-title {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state p {
+            font-size: 16px;
+        }
+
+        /* Custom Select Styling */
+        .custom-select-wrapper {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .custom-select {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+            font-size: 16px;
+        }
+
+        .custom-select:hover {
+            border-color: #667eea;
+        }
+
+        .custom-select.active {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .custom-select-text {
+            color: #333;
+        }
+
+        .custom-select-text.placeholder {
+            color: #999;
+        }
+
+        .custom-select-arrow {
+            transition: transform 0.3s;
+        }
+
+        .custom-select.active .custom-select-arrow {
+            transform: rotate(180deg);
+        }
+
+        .custom-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 12px;
+            margin-top: 5px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .custom-options.active {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .custom-option {
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .custom-option:last-child {
+            border-bottom: none;
+        }
+
+        .custom-option:hover {
+            background: #f8f9fa;
+        }
+
+        .custom-option-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 3px;
+        }
+
+        .custom-option-email {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .custom-option-balance {
+            float: right;
+            color: #667eea;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Section -->
+        <div class="login-section" id="loginSection">
+            <h1>🔐 Login</h1>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" placeholder="Digite seu email">
+            </div>
+            <div class="form-group" id="passwordField" style="display: none;">
+                <label for="password">Palavra-passe:</label>
+                <input type="password" id="password" placeholder="Digite sua palavra-passe">
+            </div>
+            <button onclick="login()">Entrar</button>
+            <p class="error" id="loginError"></p>
+        </div>
+
+        <!-- Admin Panel -->
+        <div class="admin-panel hidden" id="adminPanel">
+            <h1>💼 Painel Administrativo</h1>
+            
+            <div class="stats">
+                <h2 id="totalAmount">¥ 0</h2>
+                <p>Total em Ypes</p>
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('transactions')">💰 Transações</button>
+                <button class="tab" onclick="switchTab('people')">👥 Pessoas</button>
+            </div>
+
+            <!-- Transactions Tab -->
+            <div class="tab-content active" id="transactionsTab">
+                <h2 class="section-title">Adicionar Transação</h2>
+                
+                <div class="form-group">
+                    <label>Selecionar Pessoa:</label>
+                    <div class="custom-select-wrapper">
+                        <div class="custom-select" onclick="toggleSelect()">
+                            <span class="custom-select-text placeholder" id="selectedPersonText">-- Selecione uma pessoa --</span>
+                            <span class="custom-select-arrow">▼</span>
+                        </div>
+                        <div class="custom-options" id="customOptions"></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="amount">Valor (Ypes):</label>
+                    <input type="number" id="amount" placeholder="Ex: 0">
+                </div>
+
+                <div class="form-group">
+                    <label for="action">Ação:</label>
+                    <textarea id="action" placeholder="Ex: comprou uma bolsa"></textarea>
+                </div>
+
+                <button onclick="addTransaction()">Adicionar Transação</button>
+
+                <div class="transaction-list">
+                    <h2 class="section-title">📋 Transações Recentes</h2>
+                    <div id="transactionsList"></div>
+                </div>
+            </div>
+
+            <!-- People Tab -->
+            <div class="tab-content" id="peopleTab">
+                <h2 class="section-title">Adicionar Pessoa</h2>
+                
+                <div class="form-group">
+                    <label for="personName">Nome:</label>
+                    <input type="text" id="personName" placeholder="Ex: Duarte">
+                </div>
+
+                <div class="form-group">
+                    <label for="personEmail">Email:</label>
+                    <input type="email" id="personEmail" placeholder="Ex: duarte@email.com">
+                </div>
+
+                <button onclick="addPerson()">Adicionar Pessoa</button>
+
+                <div class="people-list">
+                    <h2 class="section-title">👥 Lista de Pessoas</h2>
+                    <div id="peopleList"></div>
+                </div>
+            </div>
+
+            <button class="logout-btn" onclick="logout()">Sair</button>
+        </div>
+
+        <!-- User Panel -->
+        <div class="user-panel hidden" id="userPanel">
+            <h1>💼 Minha Conta</h1>
+            
+            <div class="stats">
+                <h2 id="userBalance">¥ 0</h2>
+                <p>Meu Saldo em Ypes</p>
+            </div>
+
+            <div class="transaction-list">
+                <h2 class="section-title">📋 Minhas Transações</h2>
+                <div id="userTransactionsList"></div>
+            </div>
+
+            <button class="logout-btn" onclick="logout()">Sair</button>
+        </div>
+    </div>
+
+    <script>
+        const ADMIN_EMAIL = 'tomascosta21951a@aelixa.pt';
+        const ADMIN_PASSWORD = 'Claude.ia';
+        let transactions = [];
+        let people = [];
+        let totalYpes = 0;
+        let currentTab = 'transactions';
+        let selectedPersonId = null;
+        let currentUser = null;
+
+        // Show/hide password field based on email
+        document.getElementById('email').addEventListener('input', function() {
+            const email = this.value.trim();
+            const passwordField = document.getElementById('passwordField');
+            
+            if (email === ADMIN_EMAIL) {
+                passwordField.style.display = 'block';
+            } else {
+                passwordField.style.display = 'none';
+                document.getElementById('password').value = '';
+            }
+        });
+
+        function login() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const errorEl = document.getElementById('loginError');
+
+            if (email === ADMIN_EMAIL) {
+                if (password === ADMIN_PASSWORD) {
+                    document.getElementById('loginSection').classList.add('hidden');
+                    document.getElementById('adminPanel').classList.remove('hidden');
+                    currentUser = { email, isAdmin: true };
+                    errorEl.textContent = '';
+                    loadData();
+                } else {
+                    errorEl.textContent = 'Palavra-passe incorreta!';
+                }
+            } else {
+                const person = people.find(p => p.email === email);
+                if (person) {
+                    document.getElementById('loginSection').classList.add('hidden');
+                    document.getElementById('userPanel').classList.remove('hidden');
+                    currentUser = { ...person, isAdmin: false };
+                    errorEl.textContent = '';
+                    loadUserData();
+                } else {
+                    errorEl.textContent = 'Email não encontrado!';
+                }
+            }
+        }
+
+        function toggleSelect() {
+            const select = document.querySelector('.custom-select');
+            const options = document.getElementById('customOptions');
+            select.classList.toggle('active');
+            options.classList.toggle('active');
+        }
+
+        function selectPerson(personId) {
+            const person = people.find(p => p.id === personId);
+            if (person) {
+                selectedPersonId = personId;
+                const textEl = document.getElementById('selectedPersonText');
+                textEl.textContent = `${person.name} (${person.email})`;
+                textEl.classList.remove('placeholder');
+            }
+            toggleSelect();
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            if (tab === 'transactions') {
+                document.querySelector('.tab:nth-child(1)').classList.add('active');
+                document.getElementById('transactionsTab').classList.add('active');
+            } else {
+                document.querySelector('.tab:nth-child(2)').classList.add('active');
+                document.getElementById('peopleTab').classList.add('active');
+            }
+        }
+
+        function addPerson() {
+            const name = document.getElementById('personName').value.trim();
+            const email = document.getElementById('personEmail').value.trim();
+
+            if (!name || !email) {
+                alert('Por favor, preencha todos os campos!');
+                return;
+            }
+
+            if (people.find(p => p.email === email)) {
+                alert('Email já cadastrado!');
+                return;
+            }
+
+            const person = {
+                id: Date.now(),
+                name,
+                email,
+                balance: 0
+            };
+
+            people.push(person);
+
+            document.getElementById('personName').value = '';
+            document.getElementById('personEmail').value = '';
+
+            updatePeopleDisplay();
+            updatePersonSelect();
+        }
+
+        function deletePerson(id) {
+            if (confirm('Tem certeza que deseja remover esta pessoa?')) {
+                const person = people.find(p => p.id === id);
+                if (person) {
+                    totalYpes -= person.balance;
+                }
+                
+                people = people.filter(p => p.id !== id);
+                transactions = transactions.filter(t => t.personId !== id);
+                
+                updatePeopleDisplay();
+                updatePersonSelect();
+                updateTransactionsDisplay();
+            }
+        }
+
+        function updatePeopleDisplay() {
+            const listEl = document.getElementById('peopleList');
+            
+            if (people.length === 0) {
+                listEl.innerHTML = '<div class="empty-state"><p>Nenhuma pessoa cadastrada ainda.</p></div>';
+                return;
+            }
+
+            listEl.innerHTML = '';
+
+            people.forEach(p => {
+                const div = document.createElement('div');
+                div.className = 'person-item';
+                div.innerHTML = `
+                    <div class="person-info">
+                        <h3>${p.name}</h3>
+                        <p>${p.email}</p>
+                    </div>
+                    <div class="person-actions">
+                        <span class="person-balance">¥ ${p.balance}</span>
+                        <button class="delete-btn" onclick="deletePerson(${p.id})">🗑️ Remover</button>
+                    </div>
+                `;
+                listEl.appendChild(div);
+            });
+        }
+
+        function updatePersonSelect() {
+            const optionsEl = document.getElementById('customOptions');
+            optionsEl.innerHTML = '';
+            
+            if (people.length === 0) {
+                const div = document.createElement('div');
+                div.className = 'custom-option';
+                div.style.textAlign = 'center';
+                div.style.color = '#999';
+                div.textContent = 'Nenhuma pessoa cadastrada';
+                optionsEl.appendChild(div);
+                return;
+            }
+            
+            people.forEach(p => {
+                const div = document.createElement('div');
+                div.className = 'custom-option';
+                div.onclick = () => selectPerson(p.id);
+                div.innerHTML = `
+                    <div class="custom-option-name">${p.name}</div>
+                    <div class="custom-option-email">${p.email}</div>
+                    <div class="custom-option-balance">¥ ${p.balance}</div>
+                `;
+                optionsEl.appendChild(div);
+            });
+        }
+
+        function addTransaction() {
+            const amount = parseInt(document.getElementById('amount').value);
+            const action = document.getElementById('action').value.trim();
+
+            if (!selectedPersonId || !amount || !action) {
+                alert('Por favor, preencha todos os campos!');
+                return;
+            }
+
+            const person = people.find(p => p.id === selectedPersonId);
+            if (!person) {
+                alert('Pessoa não encontrada!');
+                return;
+            }
+
+            const transaction = {
+                id: Date.now(),
+                personId: person.id,
+                name: person.name,
+                email: person.email,
+                amount,
+                action,
+                date: new Date().toLocaleString('pt-PT')
+            };
+
+            transactions.unshift(transaction);
+            person.balance += amount;
+            totalYpes += amount;
+
+            selectedPersonId = null;
+            document.getElementById('selectedPersonText').textContent = '-- Selecione uma pessoa --';
+            document.getElementById('selectedPersonText').classList.add('placeholder');
+            document.getElementById('amount').value = '';
+            document.getElementById('action').value = '';
+
+            updateTransactionsDisplay();
+            updatePeopleDisplay();
+            updatePersonSelect();
+        }
+
+        function updateTransactionsDisplay() {
+            document.getElementById('totalAmount').textContent = `¥ ${totalYpes}`;
+            
+            const listEl = document.getElementById('transactionsList');
+            
+            if (transactions.length === 0) {
+                listEl.innerHTML = '<div class="empty-state"><p>Nenhuma transação registrada ainda.</p></div>';
+                return;
+            }
+
+            listEl.innerHTML = '';
+
+            transactions.forEach(t => {
+                const div = document.createElement('div');
+                div.className = 'transaction-item';
+                div.innerHTML = `
+                    <div class="transaction-info">
+                        <h3>${t.name}</h3>
+                        <p>${t.email}</p>
+                        <p>${t.action}</p>
+                        <p style="font-size: 12px; color: #999; margin-top: 5px;">${t.date}</p>
+                    </div>
+                    <div class="transaction-amount">+${t.amount}</div>
+                `;
+                listEl.appendChild(div);
+            });
+        }
+
+        function loadUserData() {
+            const person = people.find(p => p.email === currentUser.email);
+            if (!person) return;
+
+            document.getElementById('userBalance').textContent = `¥ ${person.balance}`;
+
+            const userTransactions = transactions.filter(t => t.personId === person.id);
+            const listEl = document.getElementById('userTransactionsList');
+
+            if (userTransactions.length === 0) {
+                listEl.innerHTML = '<div class="empty-state"><p>Nenhuma transação ainda.</p></div>';
+                return;
+            }
+
+            listEl.innerHTML = '';
+
+            userTransactions.forEach(t => {
+                const div = document.createElement('div');
+                div.className = 'transaction-item';
+                div.innerHTML = `
+                    <div class="transaction-info">
+                        <p><strong>${t.action}</strong></p>
+                        <p style="font-size: 12px; color: #999; margin-top: 5px;">${t.date}</p>
+                    </div>
+                    <div class="transaction-amount">+${t.amount}</div>
+                `;
+                listEl.appendChild(div);
+            });
+        }
+
+        function loadData() {
+            updatePeopleDisplay();
+            updatePersonSelect();
+            updateTransactionsDisplay();
+        }
+
+        function logout() {
+            document.getElementById('adminPanel').classList.add('hidden');
+            document.getElementById('userPanel').classList.add('hidden');
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('email').value = '';
+            currentUser = null;
+        }
+
+        // Close select when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.custom-select-wrapper')) {
+                document.querySelector('.custom-select')?.classList.remove('active');
+                document.getElementById('customOptions')?.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>
